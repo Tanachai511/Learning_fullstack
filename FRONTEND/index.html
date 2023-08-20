@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container grid-list-xs>
+                    <h2>EXAMPLE CRUD</h2>
+                    <form class="flex flex-row" @submit.prevent="(form.id)?update(form.id):create()">
+                        <v-text-field v-model="form.first_name" label="ชื่อ" id="id"></v-text-field>
+                        <v-text-field v-model="form.last_name" label="นามสกุล" id="id"></v-text-field>
+                        <v-text-field v-model="form.tel" label="เบอร์โทรศัพท์" id="id"></v-text-field>
+                        <v-text-field v-model="form.address" label="ที่อยู่" id="id"></v-text-field>
+                        <v-text-field v-model="form.gender" label="เพศ" id="id"></v-text-field>
+                        <v-text-field v-model="form.email" label="อีเมลล์" id="id"></v-text-field>
+                        <v-btn type="submit" color="success">{{(form.id)?'Update':'Create'}}</v-btn>
+                    </form>
+                    <br>
+                    <v-text-field v-model="search" label="Search" id="id"></v-text-field>
+                    <v-data-table :headers="headers" :items="list" :search="search">
+                        <template v-slot:item.action="{ item }">
+                            <div>
+                                <v-btn @click="form = item" color="warning">edit</v-btn>
+                                <v-btn @click="remove(item.id)" color="error">delete</v-btn>
+                            </div>
+                        </template>
+                    </v-data-table>
+                </v-container>
+            </v-main>
+        </v-app>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <script>
+        const host = "http://localhost:8000"
+        const vue_home = new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: () => {
+                return ({
+                    name: 'Vue',
+                    list: [],
+                    form: {},
+                    search: '',
+                    headers: [{
+                        text: 'ชื่อ',
+                        value: 'first_name',
+                        },
+                        {
+                        text: 'นามสกุล',
+                        value: 'last_name',
+                        },
+                        {
+                        text: 'เบอร์โทรศัพท์',
+                        value: 'tel',
+                        },
+                        {
+                        text: 'เพศ',
+                        value: 'gender',
+                        },
+                        {
+                        text: 'ที่อยู่',
+                        value: 'address',
+                        },
+                        {
+                        text: 'อีเมลล์',
+                        value: 'email',
+                        },
+                        {
+                        text: 'สถานะ',
+                        value: 'status',
+                        },
+                        {
+                        text: 'Action',
+                        value: 'action',
+                        }
+                    ]
+                })
+            },
+            async created() {
+                await this.load()
+            },
+            methods: {
+                async load() {
+                    this.form = {}
+                    await axios.get(`${host}/users`).then((res) => {
+                        this.list = res.data
+                    })
+                },
+                async remove(id) {
+                    let confirm = window.confirm('คุณต้องการลบข้อมูลใช่หรือไม่')
+                    if(confirm){await axios.delete(`${host}/users/${id}`).then(async(res) => {
+                        await this.load()
+                        let result = res.data
+                        alert(result.message)
+                    })
+                    }
+                },
+                async update(id) {
+                    let check = window.confirm('คุณต้องการแก้ไขข้อมูลใช่หรือไม่')
+                    if(check){await axios.put(`${host}/users/${id}`, this.form).then(async(res) => {
+                        alert(res.data.message)
+                    })
+                    }
+                    await this.load()
+                },
+                async create() {
+                    await axios.post(`${host}/users`, this.form).then(async(res) => {
+                        await this.load()
+                    })
+                },
+            },
+
+
+        })
+    </script>
+</body>
+
+</html>
+template.html
+กำลังแสดง template.html
